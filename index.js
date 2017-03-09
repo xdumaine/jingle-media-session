@@ -192,7 +192,9 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         this.streams.forEach(function (stream) {
             self.onRemoveStream({stream: stream});
         });
-        this.pc.close();
+        if (this.pc.signalingState !== 'closed') {
+            this.pc.close();
+        }
         BaseSession.prototype.end.call(this, reason, silent);
     },
 
