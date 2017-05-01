@@ -255,7 +255,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         if (this.pc.isInitiator) {
             this.pc.offer(self.constraints, function (err, offer) {
                 if (err) {
-                    self._log('error', 'Could not create offer for adding new stream');
+                    self._log('error', 'Could not create offer for adding new stream', err);
                     return cb(err);
                 }
                 self.pc.handleAnswer({
@@ -263,7 +263,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                     jingle: self.pc.remoteDescription
                 }, function (err) {
                     if (err) {
-                        self._log('error', 'Could not process answer for adding new stream');
+                        self._log('error', 'Could not process answer for adding new stream', err);
                         return cb(err);
                     }
                     offer.jingle.contents.forEach(function (content) {
@@ -284,12 +284,12 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                 jingle: this.pc.remoteDescription
             }, function (err) {
                 if (err) {
-                    self._log('error', 'Could not process offer for adding new stream');
+                    self._log('error', 'Could not process offer for adding new stream', err);
                     return cb(err);
                 }
                 self.pc.answer(self.constraints, function (err, answer) {
                     if (err) {
-                        self._log('error', 'Could not create answer for adding new stream');
+                        self._log('error', 'Could not create answer for adding new stream', err);
                         return cb(err);
                     }
                     answer.jingle.contents.forEach(function (content) {
@@ -338,7 +338,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         if (this.pc.isInitiator) {
             this.pc.offer(self.constraints, function (err) {
                 if (err) {
-                    self._log('error', 'Could not create offer for removing stream');
+                    self._log('error', 'Could not create offer for removing stream', err);
                     return cb(err);
                 }
                 self.pc.handleAnswer({
@@ -346,7 +346,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                     jingle: self.pc.remoteDescription
                 }, function (err) {
                     if (err) {
-                        self._log('error', 'Could not process answer for removing stream');
+                        self._log('error', 'Could not process answer for removing stream', err);
                         return cb(err);
                     }
                     cb();
@@ -358,12 +358,12 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                 jingle: this.pc.remoteDescription
             }, function (err) {
                 if (err) {
-                    self._log('error', 'Could not process offer for removing stream');
+                    self._log('error', 'Could not process offer for removing stream', err);
                     return cb(err);
                 }
                 self.pc.answer(self.constraints, function (err) {
                     if (err) {
-                        self._log('error', 'Could not create answer for removing stream');
+                        self._log('error', 'Could not create answer for removing stream', err);
                         return cb(err);
                     }
                     cb();
@@ -394,7 +394,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         if (this.pc.isInitiator) {
             this.pc.offer(self.constraints, function (err, offer) {
                 if (err) {
-                    self._log('error', 'Could not create offer for switching streams');
+                    self._log('error', 'Could not create offer for switching streams', err);
                     return cb(err);
                 }
                 offer.jingle.contents.forEach(function (content) {
@@ -406,7 +406,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                     jingle: self.pc.remoteDescription
                 }, function (err) {
                     if (err) {
-                        self._log('error', 'Could not process answer for switching streams');
+                        self._log('error', 'Could not process answer for switching streams', err);
                         return cb(err);
                     }
                     self.send('source-add', offer.jingle);
@@ -419,12 +419,12 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                 jingle: this.pc.remoteDescription
             }, function (err) {
                 if (err) {
-                    self._log('error', 'Could not process offer for switching streams');
+                    self._log('error', 'Could not process offer for switching streams', err);
                     return cb(err);
                 }
                 self.pc.answer(self.constraints, function (err, answer) {
                     if (err) {
-                        self._log('error', 'Could not create answer for switching streams');
+                        self._log('error', 'Could not create answer for switching streams', err);
                         return cb(err);
                     }
                     answer.jingle.contents.forEach(function (content) {
@@ -533,7 +533,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
             jingle: changes
         }, function (err) {
             if (err) {
-                self._log('error', 'Could not create WebRTC answer');
+                self._log('error', 'Could not create WebRTC answer', err);
                 return cb({condition: 'general-error'});
             }
             cb();
@@ -549,7 +549,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
             jingle: changes
         }, function (err) {
             if (err) {
-                self._log('error', 'Could not process WebRTC answer');
+                self._log('error', 'Could not process WebRTC answer', err);
                 return cb({condition: 'general-error'});
             }
             self.emit('accepted', self);
@@ -641,7 +641,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         if (this.pc.isInitiator) {
             this.pc.offer(this.constraints, function (err) {
                 if (err) {
-                    self._log('error', 'Error adding new stream source');
+                    self._log('error', 'Error adding new stream source', err);
                     return cb({
                         condition: 'general-error'
                     });
@@ -651,7 +651,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                     jingle: newDesc
                 }, function (err) {
                     if (err) {
-                        self._log('error', 'Error adding new stream source');
+                        self._log('error', 'Error adding new stream source', err);
                         return cb({
                             condition: 'general-error'
                         });
@@ -665,7 +665,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                 jingle: newDesc
             }, function (err) {
                 if (err) {
-                    self._log('error', 'Error adding new stream source');
+                    self._log('error', 'Error adding new stream source', err);
                     return cb({
                         condition: 'general-error'
                     });
@@ -673,7 +673,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
 
                 self.pc.answer(self.constraints, function (err) {
                     if (err) {
-                        self._log('error', 'Error adding new stream source');
+                        self._log('error', 'Error adding new stream source', err);
                         return cb({
                             condition: 'general-error'
                         });
@@ -752,7 +752,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         if (this.pc.isInitiator) {
             this.pc.offer(this.constraints, function (err) {
                 if (err) {
-                    self._log('error', 'Error removing stream source');
+                    self._log('error', 'Error removing stream source', err);
                     return cb({
                         condition: 'general-error'
                     });
@@ -762,7 +762,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                     jingle: newDesc
                 }, function (err) {
                     if (err) {
-                        self._log('error', 'Error removing stream source');
+                        self._log('error', 'Error removing stream source', err);
                         return cb({
                             condition: 'general-error'
                         });
@@ -776,14 +776,14 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                 jingle: newDesc
             }, function (err) {
                 if (err) {
-                    self._log('error', 'Error removing stream source');
+                    self._log('error', 'Error removing stream source', err);
                     return cb({
                         condition: 'general-error'
                     });
                 }
                 self.pc.answer(self.constraints, function (err) {
                     if (err) {
-                        self._log('error', 'Error removing stream source');
+                        self._log('error', 'Error removing stream source', err);
                         return cb({
                             condition: 'general-error'
                         });
