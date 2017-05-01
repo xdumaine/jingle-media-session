@@ -689,63 +689,65 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         this._log('info', 'Removing stream source');
 
         var newDesc = this.pc.remoteDescription;
-        this.pc.remoteDescription.contents.forEach(function (content, idx) {
-            var desc = content.application;
-            var ssrcs = desc.sources || [];
-            var groups = desc.sourceGroups || [];
+        if (changes && changes.contents && changes.contents.length > 0) {
+            this.pc.remoteDescription.contents.forEach(function (content, idx) {
+                var desc = content.application;
+                var ssrcs = desc.sources || [];
+                var groups = desc.sourceGroups || [];
 
-            changes.contents.forEach(function (newContent) {
-                if (content.name !== newContent.name) {
-                    return;
-                }
-
-                var newContentDesc = newContent.application;
-                var newSSRCs = newContentDesc.sources || [];
-                var newGroups = newContentDesc.sourceGroups || [];
-
-                var found, i, j, k;
-
-
-                for (i = 0; i < newSSRCs.length; i++) {
-                    found = -1;
-                    for (j = 0; j < ssrcs.length; j++) {
-                        if (newSSRCs[i].ssrc === ssrcs[j].ssrc) {
-                            found = j;
-                            break;
-                        }
+                changes.contents.forEach(function (newContent) {
+                    if (content.name !== newContent.name) {
+                        return;
                     }
-                    if (found > -1) {
-                        ssrcs.splice(found, 1);
-                        newDesc.contents[idx].application.sources = JSON.parse(JSON.stringify(ssrcs));
-                    }
-                }
 
-                // Remove ssrc-groups that are no longer needed
-                for (i = 0; i < newGroups.length; i++) {
-                    found = -1;
-                    for (j = 0; j < groups.length; j++) {
-                        if (newGroups[i].semantics === groups[j].semantics &&
-                            newGroups[i].sources.length === groups[j].sources.length) {
-                            var same = true;
-                            for (k = 0; k < newGroups[i].sources.length; k++) {
-                                if (newGroups[i].sources[k] !== groups[j].sources[k]) {
-                                    same = false;
-                                    break;
-                                }
-                            }
-                            if (same) {
+                    var newContentDesc = newContent.application;
+                    var newSSRCs = newContentDesc.sources || [];
+                    var newGroups = newContentDesc.sourceGroups || [];
+
+                    var found, i, j, k;
+
+
+                    for (i = 0; i < newSSRCs.length; i++) {
+                        found = -1;
+                        for (j = 0; j < ssrcs.length; j++) {
+                            if (newSSRCs[i].ssrc === ssrcs[j].ssrc) {
                                 found = j;
                                 break;
                             }
                         }
+                        if (found > -1) {
+                            ssrcs.splice(found, 1);
+                            newDesc.contents[idx].application.sources = JSON.parse(JSON.stringify(ssrcs));
+                        }
                     }
-                    if (found > -1) {
-                        groups.splice(found, 1);
-                        newDesc.contents[idx].application.sourceGroups = JSON.parse(JSON.stringify(groups));
+
+                    // Remove ssrc-groups that are no longer needed
+                    for (i = 0; i < newGroups.length; i++) {
+                        found = -1;
+                        for (j = 0; j < groups.length; j++) {
+                            if (newGroups[i].semantics === groups[j].semantics &&
+                                newGroups[i].sources.length === groups[j].sources.length) {
+                                var same = true;
+                                for (k = 0; k < newGroups[i].sources.length; k++) {
+                                    if (newGroups[i].sources[k] !== groups[j].sources[k]) {
+                                        same = false;
+                                        break;
+                                    }
+                                }
+                                if (same) {
+                                    found = j;
+                                    break;
+                                }
+                            }
+                        }
+                        if (found > -1) {
+                            groups.splice(found, 1);
+                            newDesc.contents[idx].application.sourceGroups = JSON.parse(JSON.stringify(groups));
+                        }
                     }
-                }
+                });
             });
-        });
+        }
 
         if (this.pc.isInitiator) {
             this.pc.offer(this.constraints, function (err) {
