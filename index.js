@@ -49,6 +49,7 @@ function MediaSession(opts) {
 
     this.pc = new RTCPeerConnection({
         iceServers: opts.iceServers || [],
+        iceTransportPolicy: opts.iceTransportPolicy || 'all',
         useJingle: true
     }, opts.constraints || {});
 
@@ -477,7 +478,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         switch (this.pc.iceConnectionState) {
             case 'checking':
                 this.connectionState = 'connecting';
-                if (opts && opts.signalEndOfCandidates) {
+                if (opts && opts.signalEndOfCandidates && !opts.disableEOCShortCircuit) {
                     this.onIceEndOfCandidates(opts);
                 }
                 break;
