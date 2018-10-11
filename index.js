@@ -486,7 +486,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
             case 'connected':
                 this.connectionState = 'connected';
                 if (opts && opts.signalIceConnected) {
-                    this.send('session-info', {connected: true});
+                    this.send('session-info', {active: true});
                 }
                 break;
             case 'disconnected':
