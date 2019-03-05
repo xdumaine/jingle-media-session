@@ -237,8 +237,61 @@ MediaSession.prototype = extend(MediaSession.prototype, {
     },
 
     // ----------------------------------------------------------------
-    // Stream control methods
+    // Media control methods
     // ----------------------------------------------------------------
+
+    findTransceiverForTrack: function (track, failIfNotFound) {
+      if (failIfNotFound !== false) {
+        failIfNotFound = true;
+      }
+
+      var transceiver = null;
+      this.pc.pc.getTransceivers().forEach(function (tc) {
+        var existingTrack = tc.sender.track;
+        if (existingTrack && existingTrack.id === track.id) {
+          transceiver = tc;
+        }
+      });
+
+      if (failIfNotFound && !transceiver) {
+        throw new Error('Failed to find transceiver containing track');
+      }
+
+      return transceiver;
+    },
+
+    addTrack: function (track, dontReuse) {
+      var availableTransceiver = null;
+
+      // reuse available transceiver
+      this.pc.pc.getTransceivers().forEach(function (tc) {
+        // find unused transceiver whose media type is the same as the track we are adding
+        if (!tc.sender.track && tc.mid.includes(track.kind)) {
+          availableTransceiver = tc;
+        }
+      });
+
+      if (dontReuse || !availableTransceiver) {
+        throw new Error('Not Implemented');
+        // return this.pc.pc.addTransceiver(track);
+      }
+
+      availableTransceiver.sender.replaceTrack(track);
+    },
+
+    removeTrack: function (track) {
+      return this.switchTrack(track, null);
+    },
+
+    switchTrack: function (oldTrack, newTrack) {
+      var transceiver = this.findTransceiverForTrack(oldTrack);
+
+      if (newTrack && transceiver.sender.track.kind !== newTrack.kind) {
+        throw new Error('Track kinds must be the same');
+      }
+
+      transceiver.sender.replaceTrack(newTrack);
+    },
 
     addStream: function (stream, renegotiate, cb) {
         var self = this;
