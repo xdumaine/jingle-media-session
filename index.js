@@ -245,12 +245,9 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         failIfNotFound = true;
       }
 
-      var transceiver = null;
-      this.pc.pc.getTransceivers().forEach(function (tc) {
+      var transceiver = this.pc.pc.getTransceivers().find(function (tc) {
         var existingTrack = tc.sender.track;
-        if (existingTrack && existingTrack.id === track.id) {
-          transceiver = tc;
-        }
+        return existingTrack && existingTrack.id === track.id;
       });
 
       if (failIfNotFound && !transceiver) {
@@ -261,14 +258,10 @@ MediaSession.prototype = extend(MediaSession.prototype, {
     },
 
     addTrack: function (track, dontReuse) {
-      var availableTransceiver = null;
-
       // reuse available transceiver
-      this.pc.pc.getTransceivers().forEach(function (tc) {
+      var availableTransceiver = this.pc.pc.getTransceivers().find(function (tc) {
         // find unused transceiver whose media type is the same as the track we are adding
-        if (!tc.sender.track && tc.mid.includes(track.kind)) {
-          availableTransceiver = tc;
-        }
+        return !tc.sender.track && tc.mid.includes(track.kind);
       });
 
       if (dontReuse || !availableTransceiver) {
