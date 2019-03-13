@@ -257,19 +257,28 @@ MediaSession.prototype = extend(MediaSession.prototype, {
       return transceiver;
     },
 
-    addTrack: function (track, dontReuse) {
+    addTrack: function (trackOrKind) {
+      var trackType;
+      var direction = 'sendrecv';
+      if (typeof trackOrKind === 'string') {
+        trackType = trackOrKind;
+      } else {
+        trackType = trackOrKind.kind;
+      }
+
       // reuse available transceiver
       var availableTransceiver = this.pc.pc.getTransceivers().find(function (tc) {
         // find unused transceiver whose media type is the same as the track we are adding
-        return !tc.sender.track && tc.mid.includes(track.kind);
+        return !tc.sender.track && tc.mid.includes(trackType);
       });
 
-      if (dontReuse || !availableTransceiver) {
-        throw new Error('Not Implemented');
-        // return this.pc.pc.addTransceiver(track);
+      if (!availableTransceiver) {
+        this._log('info', 'unable to reuse a sender, creating a new one.');
+        return this.pc.pc.addTransceiver(trackOrKind, { direction: direction });
       }
 
-      availableTransceiver.sender.replaceTrack(track);
+      availableTransceiver.sender.replaceTrack(trackOrKind);
+      availableTransceiver.direction = direction;
     },
 
     removeTrack: function (track) {
