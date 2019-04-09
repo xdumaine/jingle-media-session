@@ -269,7 +269,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
       // reuse available transceiver
       var availableTransceiver = this.pc.pc.getTransceivers().find(function (tc) {
         // find unused transceiver whose media type is the same as the track we are adding
-        return !tc.sender.track && tc.mid.includes(trackType);
+        return !tc.sender.track && tc.mid === trackType;
       });
 
       if (!availableTransceiver) {
@@ -277,8 +277,8 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         return this.pc.pc.addTransceiver(trackOrKind, { direction: direction });
       }
 
-      availableTransceiver.sender.replaceTrack(trackOrKind);
       availableTransceiver.direction = direction;
+      return availableTransceiver.sender.replaceTrack(trackOrKind);
     },
 
     removeTrack: function (track) {
@@ -292,7 +292,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
         throw new Error('Track kinds must be the same');
       }
 
-      transceiver.sender.replaceTrack(newTrack);
+      return transceiver.sender.replaceTrack(newTrack);
     },
 
     addStream: function (stream, renegotiate, cb) {
@@ -509,7 +509,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
     onIceEndOfCandidates: function (opts) {
         this._log('info', 'ICE end of candidates');
         if (opts.signalEndOfCandidates && this.lastCandidate) {
-            var endOfCandidates = this.lastCandidate.jingle;
+            var endOfCandidates = JSON.parse(JSON.stringify(this.lastCandidate.jingle));
             endOfCandidates.contents[0].transport = {
                 transportType: endOfCandidates.contents[0].transport.transportType,
                 gatheringComplete: true
