@@ -11,12 +11,12 @@
     "babel-preset-env": "^1.7.0",
     "extend-object": "^1.0.0",
     "jingle-session": "^2.0.0",
-    "rtcpeerconnection": "^8.0.0"
+    "rtcpeerconnection": "^8.4.0"
   },
   "devDependencies": {
     "browserify": "^5.11.1",
-    "covert": "^1.0.0",
-    "jshint": "^2.6.3",
+    "covert": "^1.1.1",
+    "jshint": "^2.10.2",
     "nsp": "^0.2.6",
     "precommit-hook": "^1.0.7",
     "tap-spec": "^0.2.1",
