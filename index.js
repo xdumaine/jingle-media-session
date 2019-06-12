@@ -59,6 +59,9 @@ function MediaSession(opts) {
     this.pc.on('addStream', this.onAddStream.bind(this));
     this.pc.on('removeStream', this.onRemoveStream.bind(this));
     this.pc.on('addChannel', this.onAddChannel.bind(this));
+    this.pc.on('addTrack', this.onAddTrack.bind(this));
+    this.pc.on('removeTrack', this.onRemoveTrack.bind(this));
+
 
     if (opts.stream) {
         this.addStream(opts.stream);
@@ -87,6 +90,20 @@ Object.defineProperties(MediaSession.prototype, {
         get: function () {
             if (this.pc.signalingState !== 'closed') {
                 return this.pc.getRemoteStreams();
+            }
+            return [];
+        }
+    },
+    tracks: {
+        get: function () {
+            if (this.pc.signalingState !== 'closed') {
+                return this.pc.pc.getReceivers()
+                  .filter(function (receiver) {
+                    return receiver.track;
+                  })
+                  .map(function (receiver) {
+                    return receiver.track;
+                  });
             }
             return [];
         }
@@ -274,7 +291,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
 
       if (!availableTransceiver) {
         this._log('info', 'unable to reuse a sender, creating a new one.');
-        return this.pc.pc.addTransceiver(trackOrKind, { direction: direction });
+        return this.pc.pc.addTrack(trackOrKind, { direction: direction });
       }
 
       availableTransceiver.direction = direction;
@@ -559,6 +576,20 @@ MediaSession.prototype = extend(MediaSession.prototype, {
                 this.connectionState = 'disconnected';
                 break;
         }
+    },
+
+    // ----------------------------------------------------------------
+    // Track event handlers
+    // ----------------------------------------------------------------
+
+    onAddTrack: function (event) {
+      this._log('info', 'Track added');
+      this.emit('peerTrackAdded', this, event.track);
+    },
+
+    onRemoveTrack: function (event) {
+        this._log('info', 'Track removed');
+        this.emit('peerTrackRemoved', this, event.track);
     },
 
     // ----------------------------------------------------------------
