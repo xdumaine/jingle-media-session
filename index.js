@@ -291,7 +291,7 @@ MediaSession.prototype = extend(MediaSession.prototype, {
 
       if (!availableTransceiver) {
         this._log('info', 'unable to reuse a sender, creating a new one.');
-        return this.pc.pc.addTrack(trackOrKind, { direction: direction });
+        return this.pc.pc.addTrack(trackOrKind);
       }
 
       availableTransceiver.direction = direction;
