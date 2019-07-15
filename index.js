@@ -286,7 +286,8 @@ MediaSession.prototype = extend(MediaSession.prototype, {
       // reuse available transceiver
       var availableTransceiver = this.pc.pc.getTransceivers().find(function (tc) {
         // find unused transceiver whose media type is the same as the track we are adding
-        return !tc.sender.track && tc.mid === trackType;
+        var receivingTrackIsSameKind = tc.receiver.track && tc.receiver.track.kind === trackType;
+        return !tc.sender.track && (tc.mid === trackType || receivingTrackIsSameKind);
       });
 
       if (!availableTransceiver) {
